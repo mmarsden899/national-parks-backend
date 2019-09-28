@@ -29,7 +29,11 @@ router.get('/parks', (req, res, next) => {
       // `parks` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
       // apply `.toObject` to each one
-      return parks.map(park => park.toObject())
+      return parks.map(park => park.toObject()).sort(function (a, b) {
+        a = a.name.toLowerCase()
+        b = b.name.toLowerCase()
+        return a < b ? -1 : a > b ? 1 : 0
+      })
     })
     // respond with status 200 and JSON of the parks
     .then(parks => res.status(200).json({ parks: parks }))
@@ -70,14 +74,12 @@ router.post('/parks', (req, res, next) => {
 router.patch('/parks/:id', removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.park.owner
 
   Park.findById(req.params.id)
     .then(handle404)
     .then(park => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
-      requireOwnership(req, park)
 
       // pass the result of Mongoose's `.update` to the next `.then`
       return park.updateOne(req.body.park)

@@ -9,6 +9,9 @@ const parkSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  thumbnail: {
+    type: String
+  },
   location: {
     type: String,
     required: true
