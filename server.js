@@ -10,6 +10,8 @@ const userRoutes = require('./app/routes/user_routes')
 const parkRoutes = require('./app/routes/park_routes')
 
 // require middleware
+const jwt = require('express-jwt');
+const jwksRsa = require('jwks-rsa');
 const errorHandler = require('./lib/error_handler')
 const replaceToken = require('./lib/replace_token')
 const requestLogger = require('./lib/request_logger')
@@ -44,6 +46,20 @@ app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDe
 
 // define port for API to run on
 const port = process.env.PORT || serverDevPort
+
+const checkJwt = jwt({
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: `https://dev-0r9j-iz3.auth0.com/.well-known/jwks.json`
+  }),
+
+  // Validate the audience and the issuer.
+  audience: '1HbLQ6nRcscQnN2UY5i79et3CRBQq3zQ',
+  issuer: `https://dev-0r9j-iz3.auth0.com/`,
+  algorithms: ['RS256']
+})
 
 // this middleware makes it so the client can use the Rails convention
 // of `Authorization: Token token=<token>` OR the Express convention of
