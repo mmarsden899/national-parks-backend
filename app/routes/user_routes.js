@@ -22,7 +22,7 @@ const User = require('../models/user')
 // passing this as a second argument to `router.<verb>` will make it
 // so that a token MUST be passed for that route to be available
 // it will also set `res.user`
-const requireToken = passport.authenticate('bearer', { session: false })
+// const requireToken = passport.authenticate('bearer', { session: false })
 
 // instantiate a router (mini app that only handles routes)
 const router = express.Router()
@@ -55,14 +55,37 @@ router.get('/users', (req, res, next) => {
     .catch(next)
 })
 
-router.get('/Users/:nickname', (req, res, next) => {
+router.get('/users/:nickname', (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
   console.log(req.params)
   User.find({'nickname': req.params.nickname})
+    .populate('user')
     .then(handle404)
     // if `findById` is succesful, respond with 200 and "User" JSON
     .then(User => res.status(200).json({ User: User }))
     // if an error occurs, pass it to the handler
+    .catch(next)
+})
+
+router.patch('/users/:nickname', (req, res, next) => {
+  console.log('req.body', req.body)
+  const visited = req.body.user.list
+
+  User.find({'nickname': req.params.nickname})
+    .then(handle404)
+    .then(user => {
+      console.log('heres the user', user[0])
+      const hasVisited = user[0].list.some(visit => {
+        console.log(visit)
+        return visit.toString() === visited
+      })
+      if (hasVisited) {
+        return user[0].update({$pull: {list: visited}})
+      } else {
+        return user[0].update({$push: {list: visited}})
+      }
+    })
+    .then(user => res.sendStatus(204))
     .catch(next)
 })
 

@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
     unique: true
   },
   list: [{
-    type: String
+    type: mongoose.Schema.Types.Mixed,
+    ref: 'Park'
   }]
 }, {
   timestamps: true,
