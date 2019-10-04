@@ -10,8 +10,8 @@ const userRoutes = require('./app/routes/user_routes')
 const parkRoutes = require('./app/routes/park_routes')
 
 // require middleware
-const jwt = require('express-jwt');
-const jwksRsa = require('jwks-rsa');
+const jwt = require('express-jwt')
+const jwksRsa = require('jwks-rsa')
 const errorHandler = require('./lib/error_handler')
 const replaceToken = require('./lib/replace_token')
 const requestLogger = require('./lib/request_logger')
